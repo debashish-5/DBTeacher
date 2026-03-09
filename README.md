@@ -1,289 +1,271 @@
-# TeachLoop — Cinematic Landing (README)
+# TeachLoop — Cinematic Landing (Production-grade README)
 
-**One-line summary:** a modern, production-minded landing page for an AI-teacher experience — cinematic hero, large right→left headline animation, floating media tiles, marquee text, responsive gallery, and accessibility + performance best practices.
-
-This README describes the design goals, features, tech stack, recommended assets and optimizations, deployment options, and implementation notes (diagrams, UI components, animation patterns, accessibility, testing, and CI). Use it as a single-source spec for a high-quality, responsive marketing page for an AI-teacher product.
+**One-line:** Modern, high-fidelity landing page and component library for an AI-teacher product — cinematic hero with a right→left animated headline, rich media stage, marquee, accessible carousel, and engineering-grade integration patterns for RAG and local model inference.
 
 ---
 
-## Banner / Hero (what the page delivers)
-
-A bold, cinematic hero section that:
-
-* shows a **big right→left headline** that animates in with smooth easing,
-* presents a **video / device mockup** in a media stage with floating image tiles,
-* includes a **wide marquee** (large words scrolling horizontally),
-* has compact CTA buttons (primary / ghost) and quick feature chips,
-* displays a subtle particle field and blurred gradient background to create depth.
-
-Design goals: high perceived quality, strong LCP control, graceful fallback for `prefers-reduced-motion`, and keyboard-friendly CTAs.
-
----
-
-## Key features (short list)
-
-* Large headline animation (right → left) tuned for perception and LCP.
-* Floating media stage: main video + small image tiles + ribbon gallery.
-* Marquee and short chips for context and motion.
-* Responsive, accessible features grid and gallery carousel (keyboard + indicators).
-* Performance-minded defaults: `loading="lazy"`, preloaded LCP assets, reduced-motion handling.
-* Ready for Retrieval Augmented Generation (RAG) and local model integration.
-* Production deployment guidance and performance testing checklist.
-
----
-
-## Tech stack and recommended services
-
-* Frontend: plain HTML/CSS/JS (can be ported to React + Tailwind).
-* Backend (optional): Python + Flask for RAG endpoints and Ollama integration.
-* Local LLM server: Ollama — used for on-prem model generation.
-* Vector indexing (optional): FAISS or Qdrant.
-* Hosting & CDN: Vercel or Netlify for static hosting.
-* Source control: GitHub for repo, issues and CI.
-* Images & video (credits / placeholders): Unsplash and Pexels (replace with your licensed assets).
-* Containerization: Docker (for consistent dev / staging).
-* Performance audit: Lighthouse.
-
-> Note: each of the above appears once in this README — replace placeholder names and endpoints with your production values.
-
----
-
-## Project layout (example)
+## Banner / Visual Lead
 
 ```
-teachloop/
-├─ index.html               # single-page cinematic landing
-├─ static/
-│  ├─ css/styles.css        # theme, animations
-│  ├─ js/main.js            # interactions (marquee, carousel, tilt)
-│  └─ assets/               # hero.png, hero.webp, hero.avif, hero.mp4, thumbnails
-├─ templates/               # if using Flask, teacher pages
-├─ vector_db/               # sample small JSON vector DBs
-├─ app.py                   # optional Flask backend (RAG + Ollama endpoints)
-├─ README.md                # this file
-└─ package.json / requirements.txt
+████████╗███████╗ █████╗ ██████╗ ██╗     ██╗      ██████╗  ██████╗  ██████╗ 
+╚══██╔══╝██╔════╝██╔══██╗██╔══██╗██║     ██║     ██╔═══██╗██╔═══██╗██╔═══██╗
+   ██║   █████╗  ███████║██████╔╝██║     ██║     ██║   ██║██║   ██║██║   ██║
+   ██║   ██╔══╝  ██╔══██║██╔═══╝ ██║     ██║     ██║   ██║██║   ██║██║   ██║
+   ██║   ███████╗██║  ██║██║     ███████╗███████╗╚██████╔╝╚██████╔╝╚██████╔╝
+   ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚══════╝╚══════╝ ╚═════╝  ╚═════╝  ╚═════╝ 
+```
+
+High-fidelity hero image (replace the demo asset with your production LCP image): use a short, optimized loop and a high-quality poster frame.
+
+---
+
+## Repository summary
+
+* `index.html` — single-file cinematic landing page (production patterns: LCP preloads, `prefers-reduced-motion`, lazy loading).
+* `static/css/*` — design tokens, modular styles, animation utilities.
+* `static/js/*` — marquee, carousel, tilt, particles, accessibility utilities.
+* `templates/*` — optional Flask templates for teacher pages.
+* `vector_db/*` — small JSON samples for Database and Python teacher knowledge.
+* `app.py` (optional) — Flask RAG endpoints + Ollama wiring.
+* `README.md` — this file.
+
+---
+
+## Design goals (modern high quality)
+
+1. **Perceptual performance** — prioritize LCP, minimal blocking scripts, and preloaded hero resources.
+2. **Scalable motion** — only animate transforms and opacity, avoid layout thrashing. Respect `prefers-reduced-motion`.
+3. **Visual depth** — layered gradients, blurred stripes, animated SVG blobs, soft glows and cinematic shadows.
+4. **Component-driven** — teacher card, media stage, carousel, marquee, gallery — each isolated and accessible.
+5. **RAG-ready** — two isolated vector DBs (Database / Python) and an All-Rounder path that composes retrieved snippets into a generator prompt.
+
+---
+
+## Key features (short)
+
+* Right→left headline: GPU-accelerated slide + fade for strong entrance, triggered by `IntersectionObserver`.
+* Media stage: device mockup (looped video) + floating image tiles with tilt on pointer.
+* Continuous marquee and accessible carousel with keyboard interaction and indicators.
+* Particle field canvas for subtle motion (low CPU priority).
+* Built-in performance & accessibility patterns: LCP preload, lazy loading, `aria-*`, keyboard shortcuts, reduced-motion fallbacks.
+* Production notes for asset formats: WebP / AVIF + fallbacks; H.264 MP4 for broad compatibility.
+
+---
+
+## Architecture diagram (copy to a Mermaid editor for visuals)
+
+```mermaid
+flowchart TD
+  Browser[Browser: Landing page + UI]
+  Browser -->|CTA / Query| Backend[Flask API (optional)]
+  Backend -->|embed(query)| EmbedService[Embedding service]
+  EmbedService --> VectorStore[Vector Store (FAISS / Qdrant)]
+  VectorStore --> Backend
+  Backend -->|context + prompt| LLM[Local model]
+  LLM --> Backend
+  Backend --> Browser
+
+  subgraph Assets
+    CDN[Hero images & video (CDN)]
+  end
+  Browser --> CDN
+```
+
+Notes:
+
+* Use `Embedding service` to batch embed requests; cache embeddings for repeated queries.
+* `Vector Store` choices: FAISS for in-process, Qdrant for managed/scaled deployments.
+
+---
+
+## Technology map (single mention of each major integration)
+
+* Local model inference: Ollama
+* Vector index (local): FAISS
+* Vector DB (managed): Qdrant
+* Static hosting / deployment: Vercel and Netlify (choose one)
+* Source control and CI: GitHub
+* Containerization: Docker
+* Performance audits: Lighthouse
+* Media assets (placeholders): Unsplash and Pexels
+
+(Each of the above is referenced once — replace placeholders with your production endpoints and licensed assets.)
+
+---
+
+## Visual tokens & modern theme
+
+**Color palette**
+
+* Primary gradient: `#5865f2 → #7dd3fc`
+* Background deep: `#050612 → #0f1836`
+* Muted text: `#9aa6c7`
+* Glass card: `rgba(255,255,255,0.035)`
+
+**Typography**
+
+* Display (900) for headline; `clamp()` for responsive sizing.
+* Body: Inter 16–18px baseline, 1.45 line-height.
+
+**Spacing**
+
+* Base unit: 8px; scale: 8, 16, 24, 40, 64.
+
+**Elevation**
+
+* Soft cinematic shadows: `0 30px 80px rgba(2,6,23,0.65)` for media stage.
+
+---
+
+## Colorful info boxes (examples for README or marketing pages)
+
+Use CSS cards with gradients or left accent bars. Example HTML snippet:
+
+```html
+<div class="info-box gradient">
+  <h4>Latency-Optimized Retrieval</h4>
+  <p>HNSW ANN tuned for sub-30ms tail latency with efSearch optimized for recall/latency tradeoffs.</p>
+</div>
+
+<!-- CSS -->
+<style>
+.info-box.gradient{padding:16px;border-radius:12px;color:#fff;background:linear-gradient(90deg,#5865f2,#77a8ff);box-shadow:0 12px 40px rgba(12,18,50,0.5)}
+</style>
 ```
 
 ---
 
-## Diagram (architectural flow)
+## Teacher component (responsive animated pattern)
 
-Use this visual as a quick map of how frontend → backend → vector store → LLM works. You can copy this to a diagram tool.
+**Purpose:** a focused, interactive teacher card that expands to show examples, code snippets, and citations for retrieved context.
 
-```
-[Browser / Landing Page]
-    ├─ Hero video + tiles (static assets via CDN)
-    ├─ Marquee & animations (JS + CSS)
-    └─ CTA -> /db-teacher, /py-teacher, /all-rounder
-         |
-         v
-[Flask Backend (optional)]
-    ├─ /api/query_teacher  -> loads vector_db/json or FAISS/Qdrant
-    ├─ /api/ollama_generate -> calls local Ollama for generation
-    └─ Authentication / rate limiting (if public)
-         |
-         v
-[Vector store]
-    ├─ Local JSON (small demo)
-    ├─ FAISS index (fast local retrieval)
-    └─ Qdrant (managed vector DB)
-         |
-         v
-[Local Model / Ollama]
-    └─ Generate response conditioned on retrieved context
+**HTML**
+
+```html
+<aside class="teacher-card" role="region" aria-label="Database teacher">
+  <header class="teacher-head">
+    <div><strong>Database Teacher</strong><div class="meta">SQL, ACID, Indexing</div></div>
+    <button class="toggle" aria-expanded="false" aria-controls="teacher-1-details">Examples</button>
+  </header>
+
+  <div id="teacher-1-details" class="teacher-body" hidden>
+    <pre class="code-sample" aria-live="polite">SELECT name, email FROM users WHERE active = 1;</pre>
+    <div class="teacher-footer">
+      <button class="copy">Copy</button>
+      <span class="provenance">Sources: snippet_23, snippet_7</span>
+    </div>
+  </div>
+</aside>
 ```
 
----
+**Key CSS pattern**
 
-## UI / design system recommendations
+```css
+.teacher-body{overflow:hidden; max-height:0; opacity:0; transition:max-height 360ms cubic-bezier(.2,.9,.3,1), opacity 220ms}
+.teacher-card.expanded .teacher-body{max-height:420px; opacity:1}
+```
 
-1. **Typography**
+**Behavior**
 
-   * Use a heavy display face for headline (900 weight), variable size via `clamp()`.
-   * Subtext: Inter / system sans with 18px base for reading.
-
-2. **Color system**
-
-   * Primary blurple gradient `--accent` → `--accent-2`.
-   * Muted text `--muted` for descriptions.
-   * Use subtle glass cards `--glass` for panels, with faint borders.
-
-3. **Spacing & layout**
-
-   * Max layout width ~1200–1400px.
-   * Use CSS grid for hero and feature layouts, flex for card rows.
-   * Preserve whitespace: big hero needs breathing room.
-
-4. **Animated components**
-
-   * Headline: transform + opacity animation (right → left). Trigger via IntersectionObserver.
-   * Tile tilt: mousemove rotates with `transform: rotateX()/rotateY()`; scale on hover.
-   * Ribbon: slow horizontal translation animation (loop) for visual motion.
-   * Marquee: clone content in JS to create continuous scrolling; pause on hover.
-
-5. **Colorful boxes and content cards**
-
-   * Small blur glass chips with colored left border or accent line.
-   * Use gradient backgrounds or subtle duotone images inside cards.
-
-6. **Teacher animation**
-
-   * For the “teacher” avatar / panel: use a responsive small card with:
-
-     * subtle entrance animation (slide + fade),
-     * micro-interactions (hover to reveal “examples”),
-     * code snippet preview that toggles syntax-highlighted sample.
-   * For production, use a lightweight animation library (or CSS + IntersectionObserver).
+* Toggle expands/collapses with `aria-expanded` state.
+* On expand, focus moves to the first interactive element inside.
+* Provide explicit provenance lines showing which retrieved snippets were used.
 
 ---
 
-## Accessibility & semantic best practices
+## Retrieval pipeline (high-level)
 
-* Provide `role="banner"`, `role="main"`, `role="region"` and `aria-label` where appropriate.
-* Make interactive elements keyboard focusable and visible (custom focus outline).
-* Respect `prefers-reduced-motion`: reduce or disable animations and particle canvas.
-* Use meaningful `alt` text for images. Avoid alt="" for decorative images only.
-* Provide `aria-live` regions for dynamic content (chat results).
-* Ensure color contrast (WCAG AA): check primary text vs background.
-
----
-
-## Performance checklist (high-impact)
-
-1. Preload LCP image (`<link rel="preload" as="image">`).
-2. Serve hero images as WebP/AVIF with `srcset` and `sizes`.
-3. Short looped MP4 for hero; keep < 2–4s and use a small bitrate.
-4. Defer non-critical JS (load `<script defer>` or inline minimal bootstrap).
-5. Lazy-load offscreen images (`loading="lazy"`).
-6. Compress static assets and enable Brotli/Gzip on the server/CDN.
-7. Use a CDN for heavy media and set long cache headers for immutable files.
-8. Run audits with Lighthouse and fix LCP / TBT hotspots.
+1. **Document ingestion** — chunk text (≈500 tokens) with overlap (≈50–100 tokens).
+2. **Embedding** — batch embeddings (e.g., `all-MiniLM-L6-v2` or larger) and persist vectors.
+3. **Index** — HNSW for interactive latency; IVF+PQ for very large corpora. Tune `efSearch` vs `efConstruction`.
+4. **Query** — embed user prompt → nearest neighbor retrieval (top-k) → build context window → call generator with context.
+5. **Post-process** — extract citations, generate summary and suggested follow-ups. Cache popular queries.
 
 ---
 
-## Security & privacy notes
+## Production checklist (engineer level)
 
-* Validate all user inputs on the backend; never pass raw user input into shell commands.
-* Rate-limit model generation endpoints to prevent abuse.
-* If using local LLM (Ollama), keep the service behind a firewall for private data.
-* Store API keys and credentials using environment variables (don’t commit to Git).
-
----
-
-## Production deployment & CI
-
-* Build pipeline:
-
-  * Lint HTML / CSS / JS (prettier / stylelint / eslint).
-  * Run unit / integration tests for backend.
-  * Bundle static assets (optional).
-* Example CI flow (GitHub Actions):
-
-  1. `on: push` run linters and tests.
-  2. Build artifacts and deploy to Vercel or Netlify.
-  3. Upload static assets to CDN & invalidate cache.
-* Use Docker (Docker) for dev parity:
-
-  * `docker build .` -> `docker run -p 5000:5000 teachloop:latest`
+* **LCP**: Preload hero image; ensure hero poster is first meaningful paint.
+* **Images**: Provide `srcset` and `sizes`; serve WebP/AVIF.
+* **Video**: Short loop (2–6s), H.264 MP4 + WebM; provide a poster image.
+* **Scripts**: Defer non-critical JS; inline bootstrap only.
+* **Caching**: CDN for assets; long TTL for immutable resources with hashed filenames.
+* **Observability**: instrument retrieval latency, model latency, and 95/99 percentiles; integrate with logging/metrics.
+* **Security**: sanitize prompts; rate-limit endpoints; secrets in vault.
+* **Accessibility**: axe and manual keyboard testing; color-contrast tests.
+* **Testing**: unit tests + E2E (Playwright) + Lighthouse in CI.
 
 ---
 
-## RAG & LLM integrations (high level)
+## CI / CD (recommended workflow)
 
-* Data pipeline:
-
-  1. Collect docs (markdown, text, PDFs).
-  2. Chunk into ~500 token passages, embed with a sentence embedder.
-  3. Index into FAISS or Qdrant (Qdrant).
-  4. Query: embed user prompt → nearest neighbors → compose prompt for model.
-* Backend flow:
-
-  * `/api/query_teacher` — compute embedding, retrieve top-K, return snippets.
-  * `/api/ollama_generate` — combine retrieved context + user prompt → send to local model (Ollama).
-* Always include provenance: show which snippets were used and their score.
+1. `push` → run linters (ESLint, Stylelint), unit tests, and format checks.
+2. Build assets & run Lighthouse audit (fail on regressions beyond threshold).
+3. On main branch, deploy static assets to CDN via `Vercel` or `Netlify`; deploy backend containers via `Docker` image to a managed cluster or server pool.
+4. Post deployment: run smoke tests and synthetic RUM measurement.
 
 ---
 
-## Developer tips (hard words & tech style)
+## Hardwords & engineering annotations (high-level)
 
-* Use `LCP` (largest contentful paint), `CLS` (cumulative layout shift), and `TBT` (total blocking time) metrics to prioritize perf fixes.
-* Prefer `partial hydration` or `islands architecture` if migrating to React to keep interactivity localised.
-* For vector search: use HNSW index in FAISS for sub-100ms retrieval at scale.
-* Use `batching` for embedding calls and keep a cache layer (Redis) for hot queries.
-* Use `content-encoding: br` and set a `stale-while-revalidate` policy for near-immediate content updates.
-
----
-
-## Testing & QA
-
-* Unit tests for backend (Pytest).
-* E2E tests for critical flows (Playwright or Cypress): hero LCP, CTA navigation, chat flow.
-* Accessibility tests: `axe-core` integration in CI.
-* Performance: Lighthouse via CI on staging with budgets.
+* **efSearch**: HNSW search parameter controlling recall vs latency — increase for higher recall at tail latency cost.
+* **IVF+PQ**: index topology for billion-scale corpora; trades memory for storage and approximate quality.
+* **Partial hydration / islands architecture**: keep static markup and progressively hydrate interactive islands to reduce JS payload.
+* **LCP budget**: set a numeric budget in CI to avoid regressions; optimize hero assets first.
+* **Provenance**: always show which snippet IDs or document fragments were used to answer a query to enable user verification.
 
 ---
 
-## Design assets & production checklist
+## Asset & licensing strategy
 
-* Replace remote demo images with WebP/AVIF versions sized for 1x, 2x, and 3x screens. Provide `srcset` and `sizes`.
-* Generate 2 hero video files: short MP4 H.264 fallback and optimized WebM/AV1 for modern browsers (if possible).
-* Provide a “poster” image for hero (LCP-friendly).
-* Provide SVG blobs and small icons as inline SVGs (avoid external requests).
-* Prepare an assets folder with a manifest and hashed filenames for cache busting.
+* Provide three sizes for each hero and gallery image (1x/2x/3x) in WebP/AVIF and JPEG fallback.
+* Two hero videos: optimized WebM + H.264 MP4 fallback; short loop and a lightweight poster for LCP.
+* Replace demo assets (Unsplash / Pexels) with licensed proprietary assets before production.
 
 ---
 
-## How to run quickly (dev)
+## Run locally (quick)
 
-1. Clone the repo.
-2. If static-only:
+Static preview:
 
-   * `python -m http.server --directory . 8000` and open `http://localhost:8000/index.html`.
-3. If using Flask backend:
+```bash
+python -m http.server --directory . 8000
+# open http://localhost:8000/index.html
+```
 
-   * `python -m venv venv && source venv/bin/activate`
-   * `pip install -r requirements.txt`
-   * `export FLASK_APP=app.py && flask run`
-4. Run `Lighthouse` locally and iterate on LCP.
+Optional backend (Flask with RAG endpoints):
 
----
-
-## Contribution & style guide
-
-* Branch naming: `feature/<short-descriptor>`, `fix/<issue-id>`.
-* Commit messages: conventional commits (`feat:`, `fix:`, `chore:`).
-* PRs: describe visual changes, link to screenshots, include Lighthouse baseline.
-* Code style: follow Prettier / ESLint / Stylelint rules shipped with repo.
+```bash
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+export FLASK_APP=app.py
+flask run
+```
 
 ---
 
-## Credits & resources
+## Observability & operational notes
 
-* Hero, gallery and demo media: Unsplash and Pexels (use your own licensed assets for production).
-* Tools and libraries mentioned above (Flask, FAISS, Qdrant, Ollama, React, Tailwind, Docker, GitHub, Vercel/Netlify, Lighthouse).
-
----
-
-## License
-
-This project template is provided under the MIT license unless your organization requires another license. Replace with the appropriate license file before publishing.
+* **Metrics**: Ingest retrieval latency, model latency, request rate, error rate, and resource usage.
+* **Alerts**: Alert on spikes in 95th/99th percentile model latency or increased error rates.
+* **Telemetry**: correlate frontend LCP/TBT with backend retrieval/model times to identify perf bottlenecks.
 
 ---
 
-## Final notes — high-level engineer checklist
+## Contribution & governance
 
-* Focus on LCP: optimize hero image/video first.
-* Keep animations GPU-friendly and mindful of `prefers-reduced-motion`.
-* Build a small local RAG pipeline first (JSON vector store) then scale to FAISS/Qdrant.
-* Use local model inference (Ollama) for private data or managed APIs when you need scale.
-* Automate testing & performance regression in CI (fail on major regressions).
+* Repo conventions: Conventional commits, PRs with visual diffs, Lighthouse baseline.
+* Branch strategy: `feature/*`, `fix/*`, `hotfix/*`.
+* Review checklist: accessibility, performance, security, regression tests.
 
 ---
 
-If you want, I can:
+## Next deliverables I can produce for you (pick one)
 
-* produce a `design-kit.zip` with sample WebP hero images, SVG blobs, and a short optimized hero video (LCP-friendly),
-* add a `diagram.svg` (editable) showing the RAG + Ollama flow, or
-* scaffold a GitHub Actions CI workflow (lint, test, Lighthouse audit, deploy to Vercel).
+* an **editable SVG architecture diagram** (Mermaid → SVG with layers).
+* a **design kit**: WebP hero + poster + compressed loop video + SVG blobs (ready for production).
+* a **React + Tailwind** migration scaffold with componentized teacher card, carousel and utilities.
+* production **CI workflow** (GitHub Actions) with Lighthouse gating and deployment to Vercel.
 
-Tell me which one to generate next and I’ll create it.
+Tell me which one you want next and I will generate it.
