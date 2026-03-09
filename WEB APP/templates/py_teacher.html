@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Python Teacher — TeachLoop</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <header class="nav" aria-label="Main"><div class="brand"><a href="/">TeachLoop</a></div><div class="nav-links"><a href="/">Home</a><a href="/db-teacher">DB</a><a href="/all-rounder">All</a></div></header>
+
+  <main class="hero hero-medium">
+    <div class="hero-left">
+      <div class="headline-wrap"><h1 class="headline">Python <span class="accent">Teacher</span></h1></div>
+      <p class="lead">Get code examples, explanations and best practices. The Python teacher uses a dedicated vector DB of Python content.</p>
+      <div class="cta-row"><a class="cta" href="#chat">Ask the Python Teacher</a></div>
+    </div>
+    <div class="hero-right smallpreview">
+      <div class="media-stage">
+        <div class="tile main" style="left:50%; top:40%; width:320px; height:400px;">
+          <img src="https://images.unsplash.com/photo-1555952517-1af0bd82a0e8?w=1200&q=80&auto=format&fit=crop" alt="python mockup">
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <section id="chat" class="chat-section">
+    <div class="chat-panel">
+      <div id="chatMessagesPy" class="messages"></div>
+      <form id="pyForm" class="chat-form" onsubmit="return false;">
+        <input id="pyQuery" placeholder="Ask Python question (e.g. 'explain decorators')" />
+        <button class="btn" id="pySend">Ask</button>
+      </form>
+    </div>
+  </section>
+
+  <footer class="site-footer">© 2026 TeachLoop</footer>
+
+<script src="/static/js/main.js"></script>
+<script>
+const pySend = document.getElementById('pySend'), pyQuery = document.getElementById('pyQuery'), chatMessagesPy = document.getElementById('chatMessagesPy');
+pySend.addEventListener('click', async ()=>{
+  const q = pyQuery.value.trim(); if(!q) return;
+  appendMsg('You', q, chatMessagesPy);
+  appendMsg('Teacher', 'Searching...', chatMessagesPy);
+  pyQuery.value = '';
+  try{
+    const res = await fetch('/api/query_teacher',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,teacher:'py',k:3})});
+    const j = await res.json();
+    removeLastPanelMsg(chatMessagesPy,'Teacher','Searching...');
+    appendMsg('Teacher', j.answer, chatMessagesPy);
+  }catch(e){
+    removeLastPanelMsg(chatMessagesPy,'Teacher','Searching...');
+    appendMsg('Teacher','(Server error)', chatMessagesPy);
+  }
+});
+function appendMsg(who, text, panel){ const d=document.createElement('div'); d.className='msg '+(who==='You'?'you':'teacher'); d.innerHTML=`<strong>${who}:</strong> <div>${escapeHtml(text).replace(/\n/g,'<br>')}</div>`; panel.appendChild(d); panel.scrollTop=panel.scrollHeight; }
+function removeLastPanelMsg(panel, who, startsWith){ const nodes=Array.from(panel.children).reverse(); for(const n of nodes){ if(n.textContent.startsWith(who) && n.textContent.includes(startsWith)){ n.remove(); return; } } }
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
+</script>
+</body>
+</html>

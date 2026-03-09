@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Database Teacher — TeachLoop</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <header class="nav" aria-label="Main">
+    <div class="brand"><a href="/">TeachLoop</a></div>
+    <div class="nav-links"><a href="/">Home</a><a href="/py-teacher">Python</a><a href="/all-rounder">All</a></div>
+  </header>
+
+  <main class="hero hero-medium">
+    <div class="hero-left">
+      <div class="headline-wrap">
+        <h1 class="headline">Database <span class="accent">Teacher</span></h1>
+      </div>
+      <p class="lead">Ask SQL, transactions, indexing, normalization. This teacher searches the Database vector store and returns grounded snippets + summary.</p>
+      <div class="cta-row"><a class="cta" href="#chat">Ask the DB Teacher</a></div>
+    </div>
+    <div class="hero-right smallpreview">
+      <div class="media-stage">
+        <div class="tile main" style="left:50%; top:40%; width:320px; height:400px;">
+          <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&q=80&auto=format&fit=crop" alt="DB mockup">
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <section id="chat" class="chat-section">
+    <div class="chat-panel">
+      <div id="chatMessages" class="messages"></div>
+      <form id="dbForm" class="chat-form" onsubmit="return false;">
+        <input id="dbQuery" placeholder="Ask DB question (e.g., 'what is normalization?')" autocomplete="off" />
+        <button class="btn" id="dbSend">Ask</button>
+      </form>
+    </div>
+  </section>
+
+  <footer class="site-footer">© 2026 TeachLoop</footer>
+
+<script src="/static/js/main.js"></script>
+<script>
+const dbSend = document.getElementById('dbSend'), dbQuery = document.getElementById('dbQuery'), chatMessages = document.getElementById('chatMessages');
+dbSend.addEventListener('click', async ()=>{
+  const q = dbQuery.value.trim(); if(!q) return;
+  appendMsg('You', q, chatMessages);
+  appendMsg('Teacher', 'Searching...', chatMessages);
+  dbQuery.value = '';
+  try{
+    const res = await fetch('/api/query_teacher',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,teacher:'db',k:3})});
+    const j = await res.json();
+    removeLastPanelMsg(chatMessages,'Teacher','Searching...');
+    appendMsg('Teacher', j.answer, chatMessages);
+  }catch(e){
+    removeLastPanelMsg(chatMessages,'Teacher','Searching...');
+    appendMsg('Teacher','(Server error)', chatMessages);
+  }
+});
+
+function appendMsg(who, text, panel){
+  const d = document.createElement('div');
+  d.className = 'msg ' + (who==='You'?'you':'teacher');
+  d.innerHTML = `<strong>${who}:</strong> <div>${escapeHtml(text).replace(/\n/g,'<br>')}</div>`;
+  panel.appendChild(d); panel.scrollTop = panel.scrollHeight;
+}
+function removeLastPanelMsg(panel, who, startsWith){
+  const nodes = Array.from(panel.children).reverse();
+  for(const n of nodes){ if(n.textContent.startsWith(who) && n.textContent.includes(startsWith)){ n.remove(); return; } }
+}
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
+</script>
+</body>
+</html>

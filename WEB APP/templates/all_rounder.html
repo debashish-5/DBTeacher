@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>All-Rounder — TeachLoop</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <header class="nav" aria-label="Main"><div class="brand"><a href="/">TeachLoop</a></div><div class="nav-links"><a href="/">Home</a><a href="/db-teacher">DB</a><a href="/py-teacher">Python</a></div></header>
+
+  <main class="hero hero-medium">
+    <div class="hero-left"><div class="headline-wrap"><h1 class="headline">All-Rounder <span class="accent">Teacher</span></h1></div><p class="lead">Combines both DB & Python context and calls a local Ollama model to generate helpful answers with examples.</p><div class="cta-row"><a class="cta" href="#chat">Ask the All-Rounder</a></div></div>
+    <div class="hero-right smallpreview"><div class="media-stage"><div class="tile main" style="left:50%; top:40%; width:320px; height:400px;"><img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&q=80&auto=format&fit=crop" alt="allround"></div></div></div>
+  </main>
+
+  <section id="chat" class="chat-section">
+    <div class="chat-panel">
+      <div id="chatMessagesAll" class="messages"></div>
+      <form id="allForm" class="chat-form" onsubmit="return false;">
+        <input id="allQuery" placeholder="Ask anything — Ollama will answer with context" />
+        <button class="btn" id="allSend">Ask</button>
+      </form>
+    </div>
+  </section>
+
+  <footer class="site-footer">© 2026 TeachLoop</footer>
+
+<script src="/static/js/main.js"></script>
+<script>
+const allSend = document.getElementById('allSend'), allQuery = document.getElementById('allQuery'), chatMessagesAll = document.getElementById('chatMessagesAll');
+allSend.addEventListener('click', async ()=>{
+  const q = allQuery.value.trim(); if(!q) return;
+  appendMsg('You', q, chatMessagesAll);
+  appendMsg('Teacher', 'Contacting Ollama...', chatMessagesAll);
+  allQuery.value='';
+  try{
+    const res = await fetch('/api/ollama_generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,model:'llama2'})});
+    const j = await res.json();
+    removeLastPanelMsg(chatMessagesAll,'Teacher','Contacting Ollama...');
+    appendMsg('Teacher', j.answer, chatMessagesAll);
+  }catch(e){
+    removeLastPanelMsg(chatMessagesAll,'Teacher','Contacting Ollama...');
+    appendMsg('Teacher','(Ollama error)', chatMessagesAll);
+  }
+});
+function appendMsg(who, text, panel){ const d=document.createElement('div'); d.className='msg '+(who==='You'?'you':'teacher'); d.innerHTML=`<strong>${who}:</strong> <div>${escapeHtml(text).replace(/\n/g,'<br>')}</div>`; panel.appendChild(d); panel.scrollTop=panel.scrollHeight; }
+function removeLastPanelMsg(panel, who, startsWith){ const nodes=Array.from(panel.children).reverse(); for(const n of nodes){ if(n.textContent.startsWith(who) && n.textContent.includes(startsWith)){ n.remove(); return; } } }
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
+</script>
+</body>
+</html>
