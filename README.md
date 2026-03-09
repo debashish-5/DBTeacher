@@ -5,15 +5,16 @@
 ---
 
 ## Banner / Visual Lead
-
+```
 ████████╗███████╗ █████╗ ██████╗ ██╗     ██╗      ██████╗  ██████╗  ██████╗ 
 ╚══██╔══╝██╔════╝██╔══██╗██╔══██╗██║     ██║     ██╔═══██╗██╔═══██╗██╔═══██╗
    ██║   █████╗  ███████║██████╔╝██║     ██║     ██║   ██║██║   ██║██║   ██║
    ██║   ██╔══╝  ██╔══██║██╔═══╝ ██║     ██║     ██║   ██║██║   ██║██║   ██║
    ██║   ███████╗██║  ██║██║     ███████╗███████╗╚██████╔╝╚██████╔╝╚██████╔╝
    ╚═╝   ╚══════╝╚═╝  ╚═╝╚═╝     ╚══════╝╚══════╝ ╚═════╝  ╚═════╝  ╚═════╝ 
+```
+![Hero poster — replace with production LCP image](https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1600&q=80&auto=format&fit=crop)
 
-High-fidelity hero image (replace the demo asset with your production LCP image): use a short, optimized loop and a high-quality poster frame.
 
 ---
 
