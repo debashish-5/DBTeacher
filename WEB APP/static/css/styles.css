@@ -48,7 +48,9 @@ static/css/styles.css
 
 /* chat */
 .chat-section{max-width:1000px;margin:28px auto;padding:0 4vw}
-.chat-panel{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+/* .chat-panel{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)} */
+.chat-panel{background:wheat;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+
 .messages{max-height:420px;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:10px}
 .msg{padding:12px;border-radius:10px}
 .msg.teacher{align-self:flex-start;background:rgba(255,255,255,0.02)}
@@ -56,7 +58,8 @@ static/css/styles.css
 
 .chat-form{display:flex;gap:8px;margin-top:12px}
 .chat-form input{flex:1;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--white)}
-.chat-form button{padding:10px 14px;border-radius:10px;background:var(--accent);border:none;color:white;font-weight:800;cursor:pointer}
+/* .chat-form button{padding:10px 14px;border-radius:10px;background:var(--accent);border:none;color:white;font-weight:800;cursor:pointer} */
+.chat-form button{padding:10px 14px;border-radius:10px;background:black;border:none;color:white;font-weight:800;cursor:pointer}
 
 .site-footer{max-width:var(--maxw);margin:40px auto;padding:20px 4vw;color:var(--muted);border-top:1px solid rgba(255,255,255,0.02)}
 
